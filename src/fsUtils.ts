@@ -1,9 +1,8 @@
 import { Waiter } from '@hermes-serverless/custom-promises'
-import fs, { PathLike } from 'fs'
-import { Readable, Writable } from 'stream'
+import fs, { PathLike, ReadStream, WriteStream } from 'fs'
 import util from 'util'
 
-const setupWaiter = (stream: Readable | Writable, waiter: Waiter<any>) => {
+const setupWaiter = (stream: ReadStream | WriteStream, waiter: Waiter<any>) => {
   const onOpen = () => {
     waiter.resolve(stream)
   }
@@ -36,8 +35,8 @@ export const createFsReadStream = (
         end?: number
         highWaterMark?: number
       }
-): Promise<Readable> => {
-  const openWaiter: Waiter<Readable> = new Waiter()
+): Promise<ReadStream> => {
+  const openWaiter: Waiter<ReadStream> = new Waiter()
   const stream = fs.createReadStream(path, options)
   setupWaiter(stream, openWaiter)
   return openWaiter.finish()
@@ -55,8 +54,8 @@ export const createFsWriteStream = (
         autoClose?: boolean
         start?: number
       }
-): Promise<Writable> => {
-  const openWaiter: Waiter<Writable> = new Waiter()
+): Promise<WriteStream> => {
+  const openWaiter: Waiter<WriteStream> = new Waiter()
   const stream = fs.createWriteStream(path, options)
   setupWaiter(stream, openWaiter)
   return openWaiter.finish()
